@@ -3,7 +3,9 @@ import matplotlib.pyplot as plt
 import matplotlib
 import argparse
 from mne.datasets import eegbci
-from mne.io import read_raw_edf, concatenate_raws 
+from mne.io import read_raw_edf, concatenate_raws
+from scipy.fft import fft, fftfreq, fftshift
+import numpy as np
 
 
 def load_data_mne(files, runs):
@@ -23,9 +25,9 @@ def visualize(raw):
 
     matplotlib.use('TkAgg')
 
-    raw.plot()
-    raw.compute_psd().plot()
-    plt.show()
+    # raw.plot()
+    # raw.compute_psd().plot()
+    # plt.show()
 
 
 def filtered(raw):
@@ -33,8 +35,8 @@ def filtered(raw):
     filtered = raw.copy()
     filtered.filter(8, 30)
     
-    filtered.compute_psd().plot()
-    plt.show()
+    # filtered.compute_psd().plot()
+    # plt.show()
     
     return filtered
 
@@ -51,26 +53,3 @@ def event_epoch(raw):
     labels = epochs.events[:, -1] # y (epochs)
 
     return data, labels
-
-
-def feature_extraction(data):
-    pass
-
-
-
-
-if __name__ == "__main__":
-
-    parser = argparse.ArgumentParser()
-    
-    parser.add_argument('-f', nargs='+', type=int, help="Folder Navigation")
-    parser.add_argument('-r', nargs='+', type=int, help="Experimental Runs")
-
-    args = parser.parse_args()
-    data = load_data_mne(args.f, args.r)
-
-    visualize(data)
-    filtered_data = filtered(data)
-
-    data, labels = event_epoch(filtered_data)
-    feature_extraction(data)

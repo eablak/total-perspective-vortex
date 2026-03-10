@@ -108,32 +108,11 @@ Sampling rate of this dataset 160 Hz. 672 sample / 160 Hz = 4.2 seconds. Each ev
 
 To be able to use continuous signal and event timeline we need to proccessed for <b>epoching/segmentation</b>. The aim for here dividing continuous time series data into smaller time windows.
 
-#### Feature extraction
-
-<table align="center">
-<tr>
-<td width="45%" align="center">
-
-<img 
-src="readme_imgs/pic02.png" 
-width="100%" 
-style="border:3px solid #4CAF50; border-radius:12px;">
-
-</td>
-
-<td width="55%" style="vertical-align:middle; padding-right:20px;">
-
-With BCI there are three main sources of information that can be used to struct features from EEG signals.
-- Spectral features
-- Temporal features
-- Spatial features
-
-</td>
-
-</tr>
-</table>
-
-<b>Spectral Analysis:</b>
-Fourier theroem: <i>"time-domain signal can be expressed as sum of sines, each with specific amplitude and phase coefficients"</i>
 
 ## V.1.2 Treatment pipeline
+
+It allows you to chain together multiple steps, such as data transformations and model training, into a single, cohesive process. This not only simplifies the code but also ensures that the same sequence of steps is applied consistently to both training and testing data, thereby reducing the risk of data leakage and improving reproducibility.
+
+Components of a Pipeline:
+- A pipeline in scikit-learn consists of a sequence of steps, where each step is a tuple containing a name and a transformer or estimator object.
+- The final step in the pipeline must be an estimator (e.g., a classifier or regressor), while the preceding steps must be transformers (e.g., scalers, encoders).
