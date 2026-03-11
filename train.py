@@ -14,6 +14,7 @@ from mne.datasets import eegbci
 from mne.decoding import CSP
 
 from sklearn.model_selection import train_test_split
+import joblib
 
 
 
@@ -32,33 +33,28 @@ def handle_preprocessing(parser):
 
 def model(X_raw, y):
 
-    # Define a monte-carlo cross-validation generator (reduce variance):
     scores = []
     cv = ShuffleSplit(10, test_size=0.2, random_state=42)
 
-    # Assemble a classifier
     lda = LinearDiscriminantAnalysis()
     csp = CSP(n_components=4, reg=None, log=True, norm_trace=False)
 
-    # Use scikit-learn Pipeline with cross_val_score function
     clf = Pipeline([('CSP', csp), ('LDA', lda)])
     scores = cross_val_score(clf, X_raw, y, cv=cv, n_jobs=1)
 
-    # Printing the results
-    class_balance = np.mean(labels == labels[0])
+    class_balance = np.mean(y == y[0])
     class_balance = max(class_balance, 1. - class_balance)
     print("Classification accuracy: %f / Chance level: %f" % (np.mean(scores),
                                                             class_balance))
 
-    # plot CSP patterns estimated on full data for visualization
-
-    # csp.plot_patterns(data.info, ch_type='eeg', units='Patterns (AU)', size=1.5)
     X_train, X_val, y_train, y_val = train_test_split(
         X_raw, y, test_size=0.20, random_state=None, stratify=y
     )
     clf.fit(X_train, y_train)
     val_score = clf.score(X_val, y_val)
     print(f"Validation Accuracy: {val_score:.4f}")
+
+    joblib.dump(clf, "saved_model.pkl")
 
 
 
