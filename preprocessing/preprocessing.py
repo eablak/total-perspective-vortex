@@ -7,6 +7,34 @@ from mne.io import read_raw_edf, concatenate_raws
 from scipy.fft import fft, fftfreq, fftshift
 import numpy as np
 
+def data_infos(data):
+    
+    print("\n" ,"*" * 40, "\n")
+    print(f"Data Type: {type(data)}")
+    print(f"Data Infos: {data.info}\n")
+    print(f"Frequency: {data.info['sfreq']}")
+    print(f"Channels: {data.info['nchan']}\n")
+    print(f"Start and end time in seconds: {data.times[[0, -1]]}\n")
+    print(f"n_channels, n_timepoints {data.get_data().shape}\n")
+    print(f"Channel names: {data.ch_names}\n")
+    print("\n", "*" * 40, "\n\n")
+
+
+def epoched_data_infos(data, labels):
+    
+    print("\n" ,"*" * 40, "\n")
+    print(f"Data Type: {type(data)}")
+    print(f"Data Shape: {data.shape}\n") # trial × channel × time
+
+    print(f"Labels Type: {type(labels)}")
+    print(f"Labels Shape: {labels.shape}\n")
+
+    print(f"Unique class codes: {np.unique(labels)}")
+    print(f"Class balance: {np.bincount(labels)}") # label values e.g. 28 left hand 32 right hand
+    print("\n" ,"*" * 40, "\n\n")
+    input()
+
+
 
 def load_data_mne(files, runs):
 
@@ -37,7 +65,7 @@ def filtered(raw):
     
     # filtered.compute_psd().plot()
     # plt.show()
-    
+
     return filtered
 
 
@@ -53,3 +81,4 @@ def event_epoch(raw):
     labels = epochs.events[:, -1] # y (epochs)
 
     return data, labels
+

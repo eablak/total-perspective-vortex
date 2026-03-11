@@ -1,5 +1,5 @@
 import argparse
-from preprocessing.preprocessing import load_data_mne, visualize, filtered, event_epoch
+from preprocessing.preprocessing import load_data_mne, visualize, filtered, data_infos, event_epoch, epoched_data_infos
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -22,11 +22,15 @@ def handle_preprocessing(parser):
     
     args = parser.parse_args()
     data = load_data_mne(args.f, args.r)
+    
+    data_infos(data)
 
     visualize(data)
     filtered_data = filtered(data)
 
     data, labels = event_epoch(filtered_data)
+
+    epoched_data_infos(data, labels)
 
     return data, labels
 
