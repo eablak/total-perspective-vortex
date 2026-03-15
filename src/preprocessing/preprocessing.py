@@ -73,8 +73,7 @@ def event_epoch(raw):
     events, event_id = mne.events_from_annotations(raw)
     task_events = {'T1': event_id['T1'], 'T2': event_id['T2']}
 
-    # try with tmax=2&4 also
-    epochs = mne.Epochs(raw, events, task_events, tmin=0, tmax=2, baseline=None, preload=True)
+    epochs = mne.Epochs(raw, events, task_events, tmin=0, tmax=4, baseline=None, preload=True)
     
     data = epochs.get_data()
     labels = epochs.events[:, -1]
