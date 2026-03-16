@@ -7,6 +7,7 @@ from mne.io import read_raw_edf, concatenate_raws
 from scipy.fft import fft, fftfreq, fftshift
 import numpy as np
 import sys
+import os
 
 
 
@@ -37,14 +38,20 @@ def epoched_data_infos(data, labels):
     print("\n" ,"*" * 40, "\n\n")
 
 
-def load_data_mne(file, run):
+def load_data_mne(subjects, runs, folder_path="../dataset/"):
 
-    path = eegbci.load_data(file, run, path="../../dataset/")
+    if not os.path.exists("dataset"):
+        os.makedirs("dataset")
 
-    raw = read_raw_edf(path[0], preload=True)
-    eegbci.standardize(raw)
+    path = eegbci.load_data(subjects, runs, path=folder_path)
 
-    return raw
+    raws = [read_raw_edf(subject, preload=True) for subject in path]
+    for raw in raws:
+        eegbci.standardize(raw)
+
+    data = concatenate_raws(raws)
+
+    return data
 
 
 def visualize(raw):
@@ -84,13 +91,17 @@ def event_epoch(raw):
 
 if __name__ == "__main__":
 
-    if (len(sys.argv) != 3):
-        sys.exit("Use it with subject and run args (e.g python preprocessing.py 4 14) ")
+    parser = argparse.ArgumentParser()
 
-    subject = int(sys.argv[1])
-    run = int(sys.argv[2])
+    parser.add_argument('-f', nargs='+', type=int, help="Folder Navigation")
+    parser.add_argument('-r', nargs='+', type=int, help="Experimental Runs")
 
-    raw = load_data_mne(subject, run)
+    args = parser.parse_args()
+
+    subjects = args.f
+    runs = args.r
+
+    raw = load_data_mne(subjects, runs)
     data_infos(raw)
 
     visualize(raw)

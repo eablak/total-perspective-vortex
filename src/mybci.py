@@ -18,12 +18,13 @@ from sklearn.model_selection import train_test_split
 import joblib
 import pickle
 import time
+import os
 
 
 
 def handle_preprocessing(subject, task):
     
-    raw = load_data_mne(subject, task)
+    raw = load_data_mne(subject, task, "dataset")
     filtered_raw = filtered(raw, False)
     data, labels = event_epoch(filtered_raw)
     
@@ -32,19 +33,22 @@ def handle_preprocessing(subject, task):
 
 def save_model_datasets(clf, X_test, y_test, subject, task):
     
-    joblib.dump(clf, f"saved_model{subject}_{task}.pkl")
+    if not os.path.exists("model_results"):
+        os.makedirs("model_results")
 
-    with open(f'X_test{subject}_{task}.pkl', 'wb') as file:
+    joblib.dump(clf, f"model_results/saved_model{subject}_{task}.pkl")
+
+    with open(f'model_results/X_test{subject}_{task}.pkl', 'wb') as file:
         pickle.dump(X_test, file)
 
-    with open(f'y_test{subject}_{task}.pkl', 'wb') as file:
+    with open(f'model_results/y_test{subject}_{task}.pkl', 'wb') as file:
         pickle.dump(y_test, file)
 
 
 def train(subject, task):
 
     X_raw, y = handle_preprocessing(subject, task)
-    print(f"Total epochs: {X_raw.shape[0]}")  # !!
+    # print(f"Total epochs: {X_raw.shape[0]}")
 
     sf = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
 
@@ -71,44 +75,44 @@ def predict(subject, task):
 
     try:
         
-        loaded_model = joblib.load(f"saved_model{subject}_{task}.pkl")
+        loaded_model = joblib.load(f"model_results/saved_model{subject}_{task}.pkl")
 
-        with open(f'X_test{subject}_{task}.pkl', 'rb') as f:
+        with open(f'model_results/X_test{subject}_{task}.pkl', 'rb') as f:
             X_test = pickle.load(f)
         
-        with open(f'y_test{subject}_{task}.pkl', 'rb') as f:
+        with open(f'model_results/y_test{subject}_{task}.pkl', 'rb') as f:
             y_test = pickle.load(f)
 
         scores = []
-        print(f"epoch nb:\t[prediction] [truth] equeal?")
+        print(f"epoch nb:\t[prediction] [truth] equal?")
         for n in range(X_test.shape[0]):
             pred = loaded_model.predict(X_test[n:n+1, :, :])
-            print(f"epoch {n:02d}:\t   {pred}\t\t{y_test[n: n+1]} {'True' if pred==y_test[n: n+1] else 'False'}")
+            print(f"epoch {n:02d}:\t   {pred}\t\t{y_test[n: n+1]} {'True' if pred[0]==y_test[n] else 'False'}")
             scores.append(pred[0] == y_test[n])
             # time.sleep(2)
 
         print(f"Mean acc= {np.mean(scores)}")
 
     except OSError as e:
-        print("Train model first!")
+        print("Train model first! ",e)
 
 
 
 if __name__ == "__main__":
 
-    if len(sys.argv) == 4:
+    parser = argparse.ArgumentParser()
+    
+    parser.add_argument('-f', nargs='+', type=int, help="Folder Navigation")
+    parser.add_argument('-r', nargs='+', type=int, help="Experimental Runs")
+    parser.add_argument('-p', nargs='+', type=str, help="Process")
 
-        if sys.argv[3] == "train":
-            train(int(sys.argv[1]), int(sys.argv[2]))
-        elif sys.argv[3] == "predict":
-            predict(int(sys.argv[1]), int(sys.argv[2]))
-        else:
-            sys.exit("Wrong Processing: use it 'train' or 'predict'")
+    args = parser.parse_args()
 
-    elif len(sys.argv) == 1:
-        print("general")
+    subjects = args.f
+    runs = args.r
+    process = args.p[0]
 
-    else:
-        sys.exit("Example usages: \npython mybci.py\n" \
-        "python mybci.py 4 14 train\n" \
-        "python mybci.py 4 14 predict")
+    if process == "train":
+        train(subjects, runs)
+    elif process == "predict":
+        predict(subjects, runs)
