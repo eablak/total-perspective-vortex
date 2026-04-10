@@ -19,6 +19,7 @@ import joblib
 import pickle
 import time
 import os
+# from ft_csp.ft_csp import CSP
 
 
 
@@ -49,10 +50,14 @@ def train(subject, task):
 
     X_raw, y = handle_preprocessing(subject, task)
     # print(f"Total epochs: {X_raw.shape[0]}")
+    print(X_raw.shape)
+    input()
+
 
     sf = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
 
     lda = LinearDiscriminantAnalysis()
+    # csp = CSP()
     csp = CSP(n_components=4, reg=None, log=True, norm_trace=False)
 
     clf = Pipeline([('CSP', csp), ('LDA', lda)])
