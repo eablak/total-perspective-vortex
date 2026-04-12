@@ -12,14 +12,14 @@ from mne import Epochs, pick_types, events_from_annotations
 from mne.channels import make_standard_montage
 from mne.io import concatenate_raws, read_raw_edf
 from mne.datasets import eegbci
-from mne.decoding import CSP
+# from mne.decoding import CSP
 
 from sklearn.model_selection import train_test_split
 import joblib
 import pickle
 import time
 import os
-# from ft_csp.ft_csp import CSP
+from ft_csp.ft_csp import CSP
 
 
 
@@ -50,15 +50,20 @@ def train(subject, task):
 
     X_raw, y = handle_preprocessing(subject, task)
     # print(f"Total epochs: {X_raw.shape[0]}")
-    print(X_raw.shape)
-    input()
-
+    # print(X_raw.shape)
 
     sf = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
 
     lda = LinearDiscriminantAnalysis()
-    # csp = CSP()
-    csp = CSP(n_components=4, reg=None, log=True, norm_trace=False)
+    csp = CSP(X_raw, y, 4)
+    csp.fit()
+   
+   
+   
+    input()
+
+
+    # csp = CSP(n_components=4, reg=None, log=True, norm_trace=False)
 
     clf = Pipeline([('CSP', csp), ('LDA', lda)])
 
@@ -71,7 +76,7 @@ def train(subject, task):
     val_score = clf.score(X_val, y_val)
     
     print(f"Validation Accuracy: {val_score:.4f}")
-    print(f"{cross_val_results}\ncross_val_score: {cross_val_results.mean()}")
+    print(f"{cross_val_results}\ncros    cd /home/eablak/Desktop/total-perspective-vortex/src && python3 mybci.pys_val_score: {cross_val_results.mean()}")
 
     save_model_datasets(clf, X_test, y_test, subject, task)
 
