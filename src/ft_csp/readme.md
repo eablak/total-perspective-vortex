@@ -16,7 +16,7 @@ The aim for step3 and step 4 is converting your raw EEG data for LDA. And LDA ca
 
 <b>Step 5:</b> Transform
 
-Step56 is using step4 and step5 results for mean and std. The reason for using learned mean and std values is prevent the data leakage.
+Step5 is using step3 and step4 results for mean and std. The reason for using learned mean and std values is prevent the data leakage.
 
 - Note: Training phrase contains fit and transform but prediction contain only transform.
 

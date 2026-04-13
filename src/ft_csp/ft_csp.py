@@ -15,6 +15,7 @@ class CSP:
         self.n_times = X.shape[2]
         self.filters = None
         self.patterns = None
+        self.pick_filters = None
 
 
     # step 1: covariance matrix
@@ -64,16 +65,28 @@ class CSP:
         sorted_evalue = np.argsort(np.abs(evalue - 0.5))[::-1]
         evect = evect[:, sorted_evalue]
 
-        evect = evect[:, :self.n_components]
+        self.pick_filters = evect[:, :self.n_components]
 
-        self.filters = evect.T
-        self.patterns = pinv(evect)
+        _filters = self.pick_filters.T
+        _patterns = pinv(self.pick_filters)
+
+        return _filters, _patterns
 
 
     def fit(self):
         
         covs = self.cov_matrix()
-        self.gevp(covs)
+        self.filters, self.patterns = self.gevp(covs)
     
+        X = np.asarray([np.dot(self.filters, epoch) for epoch in self.X])
+
+        # step 3: compute features (mean power)
+        X = (X**2).mean(axis=2)
+
+        # step 4: To standardize features
+        self.mean_ = X.mean(axis=0)
+        self.std_ = X.std(axis=0)
+
+        return self
         
             
