@@ -1,4 +1,6 @@
 import numpy as np
+from scipy.linalg import eigh, pinv
+
 
 class CSP:
     
@@ -7,10 +9,12 @@ class CSP:
         self.X = X
         self.y = y
         self.n_components = n_components
-        self.classes = 0
+        self.classes = None
         self.n_epochs = X.shape[0]
         self.n_channels = X.shape[1]
         self.n_times = X.shape[2]
+        self.filters = None
+        self.patterns = None
 
 
     # step 1: covariance matrix
@@ -43,9 +47,33 @@ class CSP:
         return covs
 
 
+    # step 2: eigen decomposition
+    def gevp(self, covs):
+
+        """
+            solving generalized eigenvalue problem:
+                1- get the eigenvalues and eigenvectors
+                2- sort eigenvalues by distance from 0.5 and reorder eigenvector columns with using those indices 
+                    (the aim for here, when you order indicates only from smaller to larger you are making basic ascending order but when you order them distance from 0.5 you will get values near to 0.5 which is mean if your distance close to 0.5 the component seperates two classes almost perfectly. and we want discriminative values most so we use this approach)
+                3- select best n_components
+                4- extract filters and patterns (spatial filters: transposed eigenvectors -> (64 channels, 4 columns to 4 column, 64 channel), patterns: pseudoinverse eigenvectors -> calculate the generalized inverse of a matrix)
+        """
+
+        evalue, evect = eigh(covs[0], covs[1])
+        
+        sorted_evalue = np.argsort(np.abs(evalue - 0.5))[::-1]
+        evect = evect[:, sorted_evalue]
+
+        evect = evect[:, :self.n_components]
+
+        self.filters = evect.T
+        self.patterns = pinv(evect)
+
+
     def fit(self):
         
         covs = self.cov_matrix()
+        self.gevp(covs)
     
         
             

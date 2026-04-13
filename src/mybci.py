@@ -76,7 +76,7 @@ def train(subject, task):
     val_score = clf.score(X_val, y_val)
     
     print(f"Validation Accuracy: {val_score:.4f}")
-    print(f"{cross_val_results}\ncros    cd /home/eablak/Desktop/total-perspective-vortex/src && python3 mybci.pys_val_score: {cross_val_results.mean()}")
+    print(f"{cross_val_results}\ncross_val_score: {cross_val_results.mean()}")
 
     save_model_datasets(clf, X_test, y_test, subject, task)
 

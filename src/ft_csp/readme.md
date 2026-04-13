@@ -6,19 +6,17 @@
 
 <b>Step 2:</b> Eigen Decomposition of a Matrix (ft_fit)
 
-<b>Step 3:</b> Rank eigenvectors with eigenvalues (ft_fit)
-
 After this three steps you have to get your top filters for n_components. Point for the get your components in here is, getting only top filters from all filters. E.g if your X_raw = (120, 64, 641), you have 64 channel and if you give n_components=4 in your csp() after the process you will get only the top 4 filters from 64 filter.
 
-<b>Step 4:</b> Compute Power: compute features -> mean power (ft_fit & ft_transform)
+<b>Step 3:</b> Compute Power: compute features -> mean power (ft_fit & ft_transform)
 
-<b>Step 5:</b> Standardize (ft_fit: calculate mean and std & ft_transform: use mean and std)
+<b>Step 4:</b> Standardize (ft_fit: calculate mean and std & ft_transform: use mean and std)
 
-The aim for step4 and step 5 is converting your raw EEG data for LDA. And LDA can classify with this form. 
+The aim for step3 and step 4 is converting your raw EEG data for LDA. And LDA can classify with this form. 
 
-<b>Step 6:</b> Transform
+<b>Step 5:</b> Transform
 
-Step 6 is using step4 and step5 results for mean and std. The reason for using learned mean and std values is prevent the data leakage.
+Step56 is using step4 and step5 results for mean and std. The reason for using learned mean and std values is prevent the data leakage.
 
 - Note: Training phrase contains fit and transform but prediction contain only transform.
 
@@ -58,4 +56,24 @@ The variance-covariance matrix is a square matrix with diagonal elements that re
 
 </tr>
 </table>
- 
+
+
+### Eigen Decomposition
+
+Eigen decomposition is a method to break down a square matrix into simpler components called eigenvalues and eigenvectors. This decomposition is significant because it transforms matrix operations into simpler, scalar operations involving eigenvalues, making computations easier.
+
+<p align="center">
+  <img src="readme_imgs/pic03.png" width="55%">
+</p>
+
+<b>Eigenvalues</b> are unique scalar values linked to a matrix or linear transformation. They indicate how much an eigenvector gets stretched or compressed during the transformation.
+The eigenvector's direction remains unchanged unless the eigenvalueis negative, in which case the direction is simply reversed.
+
+<b>Eigenvectors</b> are non-zero vectors that, when multiplied by a matrix, only stretch or shrink without changing direction. The eigenvalue must be found first before the eigenvector.
+
+<i>Standard eigendecomposition doesn't know class labels exsist but we need to find spitial filters that discriminate between classes because of that we will use generalized eigenvalue decomoposition. 
+
+Generalized approach example: "Find directions where class A has high variance and class B has low variance".</i>
+
+<b>The generalized eigenvalue problem (GEVP)</b> is a more complex version of the standart eigenvalue problem and typically aries in the form: <b>Ax = λBx</b> where A and B are square matrices of the same size, x is the eigenvector, and λ is the eigenvalue. The matrix A is typically symmetric, but B does not necessarily have to be symmetric, although in many cases, it is positive definite or at least symmetric.
+
