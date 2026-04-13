@@ -16,6 +16,8 @@ class CSP:
         self.filters = None
         self.patterns = None
         self.pick_filters = None
+        self.transform_into = "average_power"
+        self.log = None
 
 
     # step 1: covariance matrix
@@ -73,7 +75,7 @@ class CSP:
         return _filters, _patterns
 
 
-    def fit(self):
+    def fit(self, X, y):
         
         covs = self.cov_matrix()
         self.filters, self.patterns = self.gevp(covs)
@@ -90,3 +92,24 @@ class CSP:
         return self
         
             
+    def transform(self, X):
+
+        X = np.asarray([np.dot(self.filters, epoch) for epoch in X])
+        
+        # compute features (mean band power)
+        if self.transform_into == "average_power":
+            X = (X**2).mean(axis=2)
+            log = True if self.log is None else self.log
+            if log:
+                X = np.log(X)
+            else:
+                X -= self.mean_
+                X /= self.std_
+        
+        return X
+    
+
+    def fit_transform(self, X, y):
+        # use parent TransformerMixin method but with custom docstring
+        self.fit(X, y)
+        return self.transform(X)

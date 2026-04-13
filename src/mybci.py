@@ -56,13 +56,6 @@ def train(subject, task):
 
     lda = LinearDiscriminantAnalysis()
     csp = CSP(X_raw, y, 4)
-    csp.fit()
-   
-   
-   
-    input()
-
-
     # csp = CSP(n_components=4, reg=None, log=True, norm_trace=False)
 
     clf = Pipeline([('CSP', csp), ('LDA', lda)])
