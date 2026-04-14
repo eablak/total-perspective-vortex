@@ -143,7 +143,7 @@ Linear discriminant analysis (LDA) and CSP apply in different circumstances. LDA
 
 ### V.1.3 Implementation
 
-This part will handled last. ft_csp
+This part handled in [here](ft_csp/readme.md).
 
 ### V.1.4 Train, Validation and Test
 
